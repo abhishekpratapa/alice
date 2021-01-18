@@ -1,11 +1,21 @@
+"""
+# -*- coding: utf-8 -*-
+# Copyright © 2020 Abhishek Pratapa. All rights reserved.
+#
+# Use of this source code is governed by a BSD-3-clause license that can
+# be found in the LICENSE.txt file or at https://opensource.org/licenses/BSD-3-Clause
+"""
+
 import alpaca_trade_api as tradeapi
 import datetime
 import numpy as np
+from pymongo import MongoClient
 import pytz
 import time
 import random
 
 from ._data import DataTemplate
+from ..cache import Cache
 
 class StockDataLoader(DataTemplate):
     futura = 1
@@ -16,6 +26,7 @@ class StockDataLoader(DataTemplate):
         self.cursor = 0
         self.start = start
         self.end = end
+        self.cache = Cache(ticker)
         self.min_sequence = min_sequence
         self.max_sequence = max_sequence
         self.num_bins = num_bins
@@ -41,19 +52,25 @@ class StockDataLoader(DataTemplate):
         while current_day != self.end:
             current_day_str = current_day.strftime("%Y-%m-%d")
             if np.is_busday(current_day_str):
-                # TODO: hit mongo database
-                start_day = current_day + datetime.timedelta(hours=9, minutes=30)
-                end_day = current_day + datetime.timedelta(hours=16)
-                start_day_str = start_day.strftime("%Y-%m-%dT%H:%M:%S" + self.__daylight_savings_offset(current_day))
-                end_day_str = end_day.strftime("%Y-%m-%dT%H:%M:%S" + self.__daylight_savings_offset(current_day))
-                barset = self.__process_bars(self.api.get_barset(self.ticker, 'minute', start=start_day_str, end=end_day_str)[self.ticker])
-                if len(barset) == 0:
+                returned_bars = self.cache.get_bars(current_day_str)
+                if returned_bars == None:
+                    start_day = current_day + datetime.timedelta(hours=9, minutes=30)
+                    end_day = current_day + datetime.timedelta(hours=16)
+                    start_day_str = start_day.strftime("%Y-%m-%dT%H:%M:%S" + self.__daylight_savings_offset(current_day))
+                    end_day_str = end_day.strftime("%Y-%m-%dT%H:%M:%S" + self.__daylight_savings_offset(current_day))
+                    barset = self.__process_bars(self.api.get_barset(self.ticker, 'minute', start=start_day_str, end=end_day_str)[self.ticker])
+                    if len(barset) == 0:
+                        time.sleep(0.3)
+                        current_day += delta
+                        continue
+                    self.data[current_day] = barset
+                    self.date.append(current_day)
+                    self.cache.add_bars(current_day_str, barset)
                     time.sleep(0.3)
-                    current_day += delta
-                    continue
-                self.data[current_day] = barset
-                self.date.append(current_day)
-                time.sleep(0.3)
+                else:
+                    self.data[current_day] = returned_bars
+                    self.date.append(current_day)
+
             current_day += delta
 
     def __daylight_savings_offset(self, date):

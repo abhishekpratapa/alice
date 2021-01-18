@@ -44,6 +44,10 @@ def load_config(path=None):
             config.alpaca_secrets = data[k]
         if k == 'tickers':
             config.tickers = data[k]
+        if k == 'start_date':
+            config.start_date = datetime.datetime.strptime(data[k], '%m/%d/%Y')
+        if k == 'end_date':
+            config.end_date = datetime.datetime.strptime(data[k], '%m/%d/%Y')
     return config
 
 class Config:

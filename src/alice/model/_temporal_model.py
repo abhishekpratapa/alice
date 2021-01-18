@@ -30,6 +30,8 @@ class TemporalModel(ModelTemplate):
             sample_weight_mode="temporal"
         )
 
+        print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
+
     def __define_model(self, input_node, seed):
         dense = tf.keras.layers.Conv1D(filters=self.conv_h, kernel_size=(1), padding='same', strides=1, use_bias=True, activation='relu')
         dropout = tf.keras.layers.Dropout(rate=0.2, seed=seed)
