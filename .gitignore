@@ -10,6 +10,7 @@ config.json
 .idea
 
 __checkpoints
+artifacts
 
 # Mac Storage File
 .DS_Store

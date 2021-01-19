@@ -11,19 +11,35 @@ from pymongo import MongoClient
 class Cache:
     def __init__(self, ticker):
         self.client = MongoClient('mongodb://localhost:27017/')
-        self.db = self.client.stocks
         self.ticker = ticker
-        self.collection = self.db[ticker]
+        self.db = None
+        self.collection = None
+        self.connected = False
+        self.__test_connection()
+
+    def __test_connection(self):
+        try:
+            client.server_info()
+            self.connected = True
+        except ConnectionFailure:
+            pass
+
+    def __init_connection(self):
+        if self.connected:
+            self.db = self.client.stocks
+            self.collection = self.db[self.ticker]
 
     def get_bars(self, current_day):
-        current_bars = self.collection.find_one({"date": current_day})
-        if current_bars != None:
-            return current_bars['data']
-        else:
-            return None
+        if self.connected:
+            current_bars = self.collection.find_one({"date": current_day})
+            if current_bars != None:
+                return current_bars['data']
+
+        return None
 
     def add_bars(self, current_day, bars):
-        bar = dict()
-        bar["date"] = current_day
-        bar["data"] = bars
-        self.collection.insert_one(bar)
+        if self.connected:
+            bar = dict()
+            bar["date"] = current_day
+            bar["data"] = bars
+            self.collection.insert_one(bar)
