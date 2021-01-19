@@ -7,4 +7,5 @@
 """
 
 from ._data import DataTemplate
+from ._multi_tickers import MultiTicker
 from ._stock_trader import StockDataLoader

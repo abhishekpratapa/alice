@@ -61,7 +61,7 @@ class Config:
         self.step_size = 1.0
         self.prediction_window = 130
         self.seed = 1248
-        self.max_iterations = 2000
+        self.max_iterations = 5000000
         self.learning_rate = 1e-3
         self.model_config = {
             'conv_h': 64,

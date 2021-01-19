@@ -17,7 +17,10 @@ class Cache:
 
     def get_bars(self, current_day):
         current_bars = self.collection.find_one({"date": current_day})
-        return current_bars['data']
+        if current_bars != None:
+            return current_bars['data']
+        else:
+            return None
 
     def add_bars(self, current_day, bars):
         bar = dict()
