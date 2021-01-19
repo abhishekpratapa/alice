@@ -40,7 +40,7 @@ class Trainer:
         print("+-----------+----------+")
 
     @staticmethod
-    def __print_footer(self):
+    def __print_footer():
         print("+-----------+----------+")
 
     def __save_checkpoint(self):
@@ -49,7 +49,7 @@ class Trainer:
 
     def train(self):
         self.__print_header()
-        while self.index < self.max_iterations:
+        while self.index < self.max_iterations and self.loader.has_next():
             data, label, weights = self.loader.next()
             self.loss = self.model.train(data, label, weights)
             self.index += 1

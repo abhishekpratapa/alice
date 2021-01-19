@@ -18,6 +18,7 @@ class MultiTicker(DataTemplate):
         self.tickers = tickers
         self.config = config
         self.loaders = dict()
+        self.__populate_tickers()
 
     def __populate_tickers(self):
         for tick in self.tickers:
@@ -25,7 +26,9 @@ class MultiTicker(DataTemplate):
                 temp_loader = self.__process_tick(tick)
                 if len(temp_loader['loader'].date) > 0:
                     self.loaders[tick] = temp_loader
-                print("Loading: " + tick)
+                    print("Loading: " + tick)
+                else:
+                    raise
             except:
                 print("Passing: " + tick)
 
@@ -61,7 +64,7 @@ class MultiTicker(DataTemplate):
         return self.loaders[selected_key]['loader']
 
     def has_next(self):
-        return True
+        return len(list(self.loaders.keys())) > 0
 
     def next(self, has_label=True):
         current_loader = self.__random_loader()

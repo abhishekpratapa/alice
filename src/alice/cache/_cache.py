@@ -7,6 +7,8 @@
 """
 
 from pymongo import MongoClient
+from pymongo.errors import ConnectionFailure
+
 
 class Cache:
     def __init__(self, ticker):
@@ -16,10 +18,11 @@ class Cache:
         self.collection = None
         self.connected = False
         self.__test_connection()
+        self.__init_connection()
 
     def __test_connection(self):
         try:
-            client.server_info()
+            self.client.server_info()
             self.connected = True
         except ConnectionFailure:
             pass

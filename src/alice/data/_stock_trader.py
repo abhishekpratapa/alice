@@ -65,7 +65,7 @@ class StockDataLoader(DataTemplate):
 
                     arr_size = len(barset)
                     arr_size -= (2 * self.num_bins + self.max_sequence)
-                    if arr_size > 0:
+                    if arr_size > 1:
                         self.data[current_day] = barset
                         self.date.append(current_day)
                         self.cache.add_bars(current_day_str, barset)
@@ -74,7 +74,7 @@ class StockDataLoader(DataTemplate):
                 else:
                     arr_size = len(returned_bars)
                     arr_size -= (2 * self.num_bins + self.max_sequence)
-                    if arr_size > 0:
+                    if arr_size > 1:
                         self.data[current_day] = returned_bars
                         self.date.append(current_day)
 
